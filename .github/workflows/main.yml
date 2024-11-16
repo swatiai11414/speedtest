@@ -1,0 +1,25 @@
+name: Internet Speed Test
+
+on: 
+  push:
+    branches:
+      - main
+
+jobs:
+  speedtest:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install speedtest-cli
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y python3-pip
+        pip3 install speedtest-cli
+
+    - name: Run speedtest
+      run: |
+        echo "Running internet speed test..."
+        speedtest-cli --simple  # Simplified output of the speed test
