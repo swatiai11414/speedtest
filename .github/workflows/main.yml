@@ -21,6 +21,7 @@ jobs:
 
     - name: Run speedtest and convert results
       run: |
+        sleep 6
         # Run the speedtest and get the results
         echo "Running internet speed test..."
         result=$(speedtest-cli --simple)
