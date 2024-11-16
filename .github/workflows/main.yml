@@ -1,6 +1,6 @@
 name: Internet Speed Test
 
-on: 
+on:
   push:
     branches:
       - main
@@ -13,13 +13,29 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Install speedtest-cli
+    - name: Install speedtest-cli and Python
       run: |
         sudo apt-get update
         sudo apt-get install -y python3-pip
         pip3 install speedtest-cli
 
-    - name: Run speedtest
+    - name: Run speedtest and convert results
       run: |
+        # Run the speedtest and get the results
         echo "Running internet speed test..."
-        speedtest-cli --simple  # Simplified output of the speed test
+        result=$(speedtest-cli --simple)
+
+        # Parse the results from speedtest-cli output
+        ping=$(echo "$result" | grep 'Ping' | awk '{print $2}')
+        download_mbit=$(echo "$result" | grep 'Download' | awk '{print $2}' | sed 's/Mbit\/s//')
+        upload_mbit=$(echo "$result" | grep 'Upload' | awk '{print $2}' | sed 's/Mbit\/s//')
+
+        # Conversion from Mbit/s to MB/s
+        download_mb=$(echo "$download_mbit / 8" | bc -l)  # Convert download speed to MB/s
+        upload_mb=$(echo "$upload_mbit / 8" | bc -l)  # Convert upload speed to MB/s
+
+        # Print the results in MB/s
+        echo "Running internet speed test..."
+        echo "Ping: $ping ms"
+        echo "Download: $(printf "%.2f" $download_mb) MB/s"
+        echo "Upload: $(printf "%.2f" $upload_mb) MB/s"
